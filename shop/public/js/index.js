@@ -2,14 +2,23 @@ $(document).ready(function () {
 
 var ip = 'http://lcoalhost:3000';
     $("button").click(function() {
-        getDate()
+
     })
 
-
+    getDate()
     function getDate() {
-        $.post("http://192.168.11.30:3000/getDate",null,function(result){
-            console.log("result:",result)
-        });
+
+        $.ajax({
+            // async:false,
+            url:"http://localhost:3000/getDate",
+            type:"post",
+            // dataType:'jsonp',
+            data:"",
+            timeout:5000,
+            success:function (data) {
+                console.log(data);
+            }
+        })
     }
 
     function delayCarry(callback) {
