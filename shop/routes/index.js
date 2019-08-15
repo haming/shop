@@ -2,6 +2,19 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 
+function getIPAddress(){
+    var interfaces = require('os').networkInterfaces();
+    for(var devName in interfaces){
+        var iface = interfaces[devName];
+        for(var i=0;i<iface.length;i++){
+            var alias = iface[i];
+            if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
+                return alias.address;
+            }
+        }
+    }
+}
+
 var connection = mysql.createConnection({
     host: '49.235.23.12',
     user: 'root',
@@ -26,6 +39,7 @@ function resheadrt(res) {
 router.post('/getDate', function (req, res, next) {
     // res = resheadrt(res)
     console.log(req)
+    console.log("ip is:",getIPAddress())
    res = resheadrt(res)
     var sql = 'SELECT * FROM userInfo';
     connection.query(sql, function (error, results, fields) {

@@ -10,8 +10,31 @@ $(document).ready(function () {
         setInfo()
     })
 
+    //获取本机的网络ip地址
+    function jsonpCallback(res) {
+        var ip = res.Ip;    // ip地址
+        var aa = res.Isp.split("市");
+        var isp = aa[0];    // ip省份
+        alert(ip);
+    }
+
+    function getIntnetIP() {
+        var JSONP=document.createElement("script");
+        JSONP.type="text/javascript";
+        JSONP.src="http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js";
+
+        console.log(JSONP)
+        document.getElementsByTagName("head")[0].appendChild(JSONP);
+    }
+    getIntnetIP();
+    // jsonpCallback()
+
+
     function getDate() {
-        $.post("http://192.168.11.30:3000/getDate", null, function (result) {
+
+        // var url = "http://192.168.11.30:3000/getDate";
+        var url = "http://localhost:3000/getDate";
+        $.post(url, null, function (result) {
             console.log("result:", result)
             $("#list").empty()
             for (var x in result.rows) {
