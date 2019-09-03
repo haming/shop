@@ -1,14 +1,49 @@
 $(document).ready(function () {
 
-    var ip = 'http://lcoalhost:3000';
+    var ip = 'http://localhost:3000';
 
     $("#getData").click(function () {
         getDate()
+            .then(function (data) {
+                $("#list").empty();
+                for (var x in data) {
+                    var v = data[x];
+                    $("#list").append("<div><span>" + v.id + "</span>--<span>" + v.name + "</span>--<span>" + v.passwork + "</span></div>")
+                }
+            })
     })
 
     $("#setData").click(function () {
-        setInfo()
-    })
+        var defer = $.Deferred();
+        getDate()
+            .then(function (data) {
+                return checkUserName(data)
+            })
+            .then(function (data) {
+                console.log("setInfo:data",data)
+                return setInfo()
+            })
+            .fail(function (data) {
+                alert(data)
+            })
+
+        return defer.promise();
+    });
+
+    function checkUserName(data) {
+        var defer = $.Deferred();
+        var username = $("#name").val();
+        $.each(data, function (_index, item) {
+            if (item.name == username) {
+                defer.reject("已有相同的名称")
+            }else{
+                if(_index == data.length-1){
+                    defer.resolve(data)
+                }
+            }
+        });
+        return defer.promise();
+    }
 
     //获取本机的网络ip地址
     function jsonpCallback(res) {
@@ -19,49 +54,51 @@ $(document).ready(function () {
     }
 
     function getIntnetIP() {
-        var JSONP=document.createElement("script");
-        JSONP.type="text/javascript";
-        JSONP.src="http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js";
+        var JSONP = document.createElement("script");
+        JSONP.type = "text/javascript";
+        JSONP.src = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js";
 
-        console.log(JSONP)
         document.getElementsByTagName("head")[0].appendChild(JSONP);
     }
+
     getIntnetIP();
+
     // jsonpCallback()
 
 
     function getDate() {
-
+        var defer = $.Deferred();
         // var url = "http://192.168.11.30:3000/getDate";
-        var url = "http://localhost:3000/getDate";
+        var url = ip + "/getDate";
         $.post(url, null, function (result) {
-            console.log("result:", result)
-            $("#list").empty()
-            for (var x in result.rows) {
-                var v = result.rows[x];
-                $("#list").append("<div><span>" + v.id + "</span>--<span>" + v.name + "</span>--<span>" + v.passwork + "</span></div>")
-            }
+            defer.resolve(result.rows);
         });
+
+        return defer.promise();
     }
 
+
     function setInfo() {
+        var defer = $.Deferred();
         var postData = {
-            name : $("#name").val(),
-            passwork : $("#passwork").val(),
+            name: $("#name").val(),
+            passwork: $("#passwork").val(),
         };
-        $.post("http://192.168.11.30:3000/setData", postData, function (result) {
-            console.log("result:", result)
-            if(result.code == "success"){
+
+        var url = ip + '/setData'
+        $.post(url, postData, function (result) {
+            if (result.code == "success") {
                 $("#name").val("")
                 $("#passwork").val("")
             }
+            defer.resolve();
         });
+        return defer.promise();
     }
 
     function delayCarry(callback) {
         var _time = 0;
         $(document).keydown(function (event) {
-            console.log(event)
             if (event.keyCode != 13) {
                 clearTimeout(_time)
                 time(callback)

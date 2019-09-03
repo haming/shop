@@ -38,7 +38,6 @@ function resheadrt(res) {
 /* GET home page. */
 router.post('/getDate', function (req, res, next) {
     // res = resheadrt(res)
-    console.log(req)
     console.log("ip is:",getIPAddress())
    res = resheadrt(res)
     var sql = 'SELECT * FROM userInfo';
