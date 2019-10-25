@@ -1,14 +1,49 @@
 $(document).ready(function () {
 
-    var ip = 'http://lcoalhost:3000';
+    var ip = 'http://localhost:3000';
 
     $("#getData").click(function () {
         getDate()
+            .then(function (data) {
+                $("#list").empty();
+                for (var x in data) {
+                    var v = data[x];
+                    $("#list").append("<div><span>" + v.id + "</span>--<span>" + v.name + "</span>--<span>" + v.passwork + "</span></div>")
+                }
+            })
     })
 
     $("#setData").click(function () {
-        setInfo()
-    })
+        var defer = $.Deferred();
+        getDate()
+            .then(function (data) {
+                return checkUserName(data)
+            })
+            .then(function (data) {
+                console.log("setInfo:data",data)
+                return setInfo()
+            })
+            .fail(function (data) {
+                alert(data)
+            })
+
+        return defer.promise();
+    });
+
+    function checkUserName(data) {
+        var defer = $.Deferred();
+        var username = $("#name").val();
+        $.each(data, function (_index, item) {
+            if (item.name == username) {
+                defer.reject("已有相同的名称")
+            }else{
+                if(_index == data.length-1){
+                    defer.resolve(data)
+                }
+            }
+        });
+        return defer.promise();
+    }
 
     $("#delData").click(function () {
         deleteInfo()
@@ -26,10 +61,12 @@ $(document).ready(function () {
         })
     }
 
+
     function setInfo() {
+        var defer = $.Deferred();
         var postData = {
-            name : $("#name").val(),
-            passwork : $("#passwork").val(),
+            name: $("#name").val(),
+            passwork: $("#passwork").val(),
         };
 
         var url = "http://localhost:3001/setData";
@@ -51,12 +88,12 @@ $(document).ready(function () {
         interfact(url,postData,function (result) {
             
         })
+
     }
 
     function delayCarry(callback) {
         var _time = 0;
         $(document).keydown(function (event) {
-            console.log(event)
             if (event.keyCode != 13) {
                 clearTimeout(_time)
                 time(callback)
