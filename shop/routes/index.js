@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 
+
+//获取ip
 function getIPAddress(){
     var interfaces = require('os').networkInterfaces();
     for(var devName in interfaces){
@@ -69,6 +71,16 @@ router.post('/setData', function (req, res, next) {
             code :"success"
         }
         res.send(data);
+
+    })
+})
+
+router.post('/delData', function (req, res, next) {
+    res = resheadrt(res);
+    var userData = req.body;
+    var sql = "INSERT INTO userInfo ( name,passwork )  VALUES ( '"+ userData.name + "','"+ userData.passwork +"')";
+
+    connection.query(sql, function (error, results, fields) {
 
     })
 })
